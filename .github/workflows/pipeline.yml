@@ -6,7 +6,6 @@ on:
       - main
   pull_request:
     branches:
-      - main
       - develop
 
 jobs:
@@ -54,6 +53,7 @@ jobs:
           path: target/*.jar
 
   code-quality:
+    name: Code Quality (SonarCloud)
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -66,28 +66,47 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Run tests with coverage
-        run: mvn clean verify -Dspring.profiles.active=ci
+      - name: Prepare Agent, Run Tests, and Generate JaCoCo Report
+        run: |
+          echo "Forçando instrumentação e geração de relatório JaCoCo..."
+          mvn compile org.jacoco:jacoco-maven-plugin:0.8.13:prepare-agent test -Dspring.profiles.active=ci
+          mvn org.jacoco:jacoco-maven-plugin:0.8.13:report -Dspring.profiles.active=ci
 
-      - name: SonarCloud Scan
+      - name: Debug JaCoCo Report Location and Size
+        run: |
+          echo "Verificando se o jacoco.xml foi gerado em target/site/jacoco/"
+          find target/ -name "jacoco.xml"
+          
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            echo "Arquivo encontrado. Tamanho (linhas):"
+            cat target/site/jacoco/jacoco.xml | wc -l
+          else
+            echo "ERRO: O arquivo jacoco.xml NÃO FOI ENCONTRADO no caminho esperado!"
+            exit 1
+          fi  
+
+      - name: SonarCloud Scan - Main Branch (SETUP)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "Executando SonarCloud Scan para Pull Request..."
-            mvn sonar:sonar \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=Leonardo Kegel \
-              -Dsonar.projectKey=leonardokegel-baitersburger-customer \
-              -Dsonar.login=$SONAR_TOKEN \
-              -Dsonar.pullrequest.key=${{ github.event.number }} \
-              -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-              -Dsonar.pullrequest.base=${{ github.base_ref }}
-          else
-            echo "Executando SonarCloud Scan para Branch Principal..."
-            mvn sonar:sonar \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=Leonardo Kegel \
-              -Dsonar.projectKey=leonardokegel-baitersburger-customer \
-              -Dsonar.login=$SONAR_TOKEN
-          fi
+          mvn sonar:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=Leonardo Kegel \
+            -Dsonar.projectKey=leonardokegel-baitersburger-customer \
+            -Dsonar.login=$SONAR_TOKEN
+
+      - name: SonarCloud Scan - Pull Request
+        if: github.event_name == 'pull_request'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "Executando Análise de Pull Request (com flags de comparação)..."
+          mvn sonar:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=Leonardo Kegel \
+            -Dsonar.projectKey=leonardokegel-baitersburger-customer \
+            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.pullrequest.key=${{ github.event.number }} \
+            -Dsonar.pullrequest.branch=${{ github.head_ref }} \
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
