@@ -6,7 +6,6 @@ on:
       - main
   pull_request:
     branches:
-      - main
       - develop
 
 jobs:
@@ -68,6 +67,19 @@ jobs:
 
       - name: Run tests with coverage
         run: mvn clean verify -Dspring.profiles.active=ci
+
+      - name: Debug JaCoCo Report Location and Size
+        run: |
+            echo "Verificando se o jacoco.xml foi gerado em target/site/jacoco/"
+            find target/ -name "jacoco.xml"
+            
+            if [ -f target/site/jacoco/jacoco.xml ]; then
+              echo "Arquivo encontrado. Tamanho (linhas):"
+              cat target/site/jacoco/jacoco.xml | wc -l
+            else
+              echo "ERRO: O arquivo jacoco.xml NÃO FOI ENCONTRADO no caminho esperado!"
+              exit 1 # Falha o pipeline se o arquivo não estiver lá
+            fi  
 
       - name: SonarCloud Scan
         env:
