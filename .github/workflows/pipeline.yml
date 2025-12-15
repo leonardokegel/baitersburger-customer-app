@@ -71,4 +71,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn sonar:sonar \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=Leonardo Kegel \
+          -Dsonar.projectKey=leonardokegel-baitersburger-customer \
           -Dsonar.login=$SONAR_TOKEN
