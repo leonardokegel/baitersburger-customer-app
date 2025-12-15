@@ -96,6 +96,7 @@ jobs:
             -Dsonar.pullrequest.key=${{ github.event.number }} \
             -Dsonar.pullrequest.branch=${{ github.head_ref }} \
             -Dsonar.pullrequest.base=${{ github.base_ref }}
+
   sonar-main-setup:
     name: Sonar Main Branch Setup
     needs: test
@@ -118,4 +119,9 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          echo "Executando Setup da Branch Principal (sem flags de
+          echo "Executando Setup da Branch Principal (sem flags de PR)..."
+          mvn sonar:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=Leonardo Kegel \
+            -Dsonar.projectKey=leonardokegel-baitersburger-customer \
+            -Dsonar.login=$SONAR_TOKEN
