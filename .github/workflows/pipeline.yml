@@ -66,7 +66,7 @@ jobs:
           cache: 'maven'
 
       - name: Run tests with coverage
-        run: mvn clean verify -Dspring.profiles.active=ci
+        run: mvn -B clean verify -Dspring.profiles.active=ci
 
       - name: Debug JaCoCo Report Location and Size
         run: |
