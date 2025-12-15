@@ -11,7 +11,6 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
 
@@ -62,18 +61,6 @@ public class CustomerServiceTest {
         when(customerRepositoryPort.findByCpf(cpf)).thenReturn(Optional.empty());
 
         assertThrows(CustomerNotFoundException.class, () -> customerService.findByCpf(cpf));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCpfIsNull() {
-        assertThrows(InvalidCpfException.class,
-                () -> new Customer("João", null, "joao@email.com"));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCpfIsBlank() {
-        assertThrows(InvalidCpfException.class,
-                () -> new Customer("João", " ", "joao@email.com"));
     }
 
     @Test

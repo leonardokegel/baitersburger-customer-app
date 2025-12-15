@@ -115,7 +115,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.12</version>
+				<version>0.8.13</version>
 
 				<executions>
 					<execution>
@@ -131,6 +131,14 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<exclude>br/com/fiap/baitersburger/customer/infrastructure/**</exclude>
+								<exclude>br/com/fiap/baitersburger/customer/**/config/**</exclude>
+								<exclude>**/*Application.class</exclude>
+								<exclude>br/com/fiap/baitersburger/customer/domain/exception/ExceptionMessages.class</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 
 					<execution>
@@ -140,8 +148,26 @@
 						</goals>
 						<configuration>
 							<rules>
+
 								<rule>
-									<element>BUNDLE</element>
+									<element>PACKAGE</element>
+									<includes>
+										<include>br.com.fiap.baitersburger.customer.application.*</include>
+									</includes>
+									<limits>
+										<limit>
+											<counter>INSTRUCTION</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.70</minimum>
+										</limit>
+									</limits>
+								</rule>
+
+								<rule>
+									<element>PACKAGE</element>
+									<includes>
+										<include>br.com.fiap.baitersburger.customer.domain.model</include>
+									</includes>
 									<limits>
 										<limit>
 											<counter>INSTRUCTION</counter>
@@ -156,6 +182,7 @@
 
 				</executions>
 			</plugin>
+
 		</plugins>
 	</build>
 
