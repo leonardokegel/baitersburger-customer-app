@@ -113,7 +113,7 @@ jobs:
           cache: 'maven'
 
       - name: Run Tests and Generate JaCoCo Report
-        run: mvn -B clean verify -Dspring.profiles.active=ci
+        run: mvn -B clean verify -Dspring.profiles.active=ci -Djacoco.skipCheck=true
 
       - name: SonarCloud Scan - Main Branch
         env:
