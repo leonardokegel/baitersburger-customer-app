@@ -119,7 +119,7 @@
 
 				<executions>
 					<execution>
-						<id>prepare-agent</id>
+						<id>default-prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
@@ -132,6 +132,9 @@
 							<goal>report</goal>
 						</goals>
 						<configuration>
+							<formats>
+								<format>XML</format>
+							</formats>
 							<excludes>
 								<exclude>br/com/fiap/baitersburger/customer/infrastructure/**</exclude>
 								<exclude>br/com/fiap/baitersburger/customer/**/config/**</exclude>

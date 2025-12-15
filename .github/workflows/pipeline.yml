@@ -66,11 +66,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Prepare Agent, Run Tests, and Generate JaCoCo Report
-        run: |
-          echo "Forçando instrumentação e geração de relatório JaCoCo..."
-          mvn compile org.jacoco:jacoco-maven-plugin:0.8.13:prepare-agent test -Dspring.profiles.active=ci
-          mvn org.jacoco:jacoco-maven-plugin:0.8.13:report -Dspring.profiles.active=ci
+      - name: Run Tests and Generate JaCoCo Report
+        run: mvn -B clean verify -Dspring.profiles.active=ci
 
       - name: Debug JaCoCo Report Location and Size
         run: |
@@ -85,28 +82,25 @@ jobs:
             exit 1
           fi  
 
-      - name: SonarCloud Scan - Main Branch (SETUP)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: SonarCloud Scan (Conditional)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn sonar:sonar \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.organization=Leonardo Kegel \
-            -Dsonar.projectKey=leonardokegel-baitersburger-customer \
-            -Dsonar.login=$SONAR_TOKEN
-
-      - name: SonarCloud Scan - Pull Request
-        if: github.event_name == 'pull_request'
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          echo "Executando Análise de Pull Request (com flags de comparação)..."
-          mvn sonar:sonar \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.organization=Leonardo Kegel \
-            -Dsonar.projectKey=leonardokegel-baitersburger-customer \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.pullrequest.key=${{ github.event.number }} \
-            -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-            -Dsonar.pullrequest.base=${{ github.base_ref }}
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "Executando Análise de Pull Request (comparação)..."
+            mvn sonar:sonar \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.organization=Leonardo Kegel \
+              -Dsonar.projectKey=leonardokegel-baitersburger-customer \
+              -Dsonar.login=$SONAR_TOKEN \
+              -Dsonar.pullrequest.key=${{ github.event.number }} \
+              -Dsonar.pullrequest.branch=${{ github.head_ref }} \
+              -Dsonar.pullrequest.base=${{ github.base_ref }}
+          else
+            echo "Executando Análise de Branch Principal (setup)..."
+            mvn sonar:sonar \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.organization=Leonardo Kegel \
+              -Dsonar.projectKey=leonardokegel-baitersburger-customer \
+              -Dsonar.login=$SONAR_TOKEN
+          fi
