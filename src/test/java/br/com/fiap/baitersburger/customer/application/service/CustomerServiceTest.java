@@ -2,7 +2,6 @@ package br.com.fiap.baitersburger.customer.application.service;
 
 import br.com.fiap.baitersburger.customer.domain.exception.CustomerAlreadyExistsException;
 import br.com.fiap.baitersburger.customer.domain.exception.CustomerNotFoundException;
-import br.com.fiap.baitersburger.customer.domain.exception.InvalidCpfException;
 import br.com.fiap.baitersburger.customer.domain.model.Customer;
 import br.com.fiap.baitersburger.customer.domain.port.out.CustomerRepositoryPort;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class CustomerServiceTest {
+class CustomerServiceTest {
 
     @Mock
     private CustomerRepositoryPort customerRepositoryPort;
