@@ -53,9 +53,10 @@ jobs:
           path: target/*.jar
 
   code-quality:
-    name: Code Quality (SonarCloud)
+    name: Code Quality (PR Analysis)
     needs: test
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
@@ -82,25 +83,39 @@ jobs:
             exit 1
           fi  
 
-      - name: SonarCloud Scan (Conditional)
+      - name: SonarCloud Scan - Pull Request
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "Executando Análise de Pull Request (comparação)..."
-            mvn sonar:sonar \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=Leonardo Kegel \
-              -Dsonar.projectKey=leonardokegel-baitersburger-customer \
-              -Dsonar.login=$SONAR_TOKEN \
-              -Dsonar.pullrequest.key=${{ github.event.number }} \
-              -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-              -Dsonar.pullrequest.base=${{ github.base_ref }}
-          else
-            echo "Executando Análise de Branch Principal (setup)..."
-            mvn sonar:sonar \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -Dsonar.organization=Leonardo Kegel \
-              -Dsonar.projectKey=leonardokegel-baitersburger-customer \
-              -Dsonar.login=$SONAR_TOKEN
-          fi
+          echo "Executando Análise de Pull Request (com flags de comparação)..."
+          mvn sonar:sonar \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=Leonardo Kegel \
+            -Dsonar.projectKey=leonardokegel-baitersburger-customer \
+            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.pullrequest.key=${{ github.event.number }} \
+            -Dsonar.pullrequest.branch=${{ github.head_ref }} \
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
+  sonar-main-setup:
+    name: Sonar Main Branch Setup
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Tests and Generate JaCoCo Report
+        run: mvn -B clean verify -Dspring.profiles.active=ci
+
+      - name: SonarCloud Scan - Main Branch
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "Executando Setup da Branch Principal (sem flags de
