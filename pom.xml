@@ -19,6 +19,12 @@
 			target/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
 		<sonar.organization>baitersburger-customer</sonar.organization>
+		<sonar.coverage.exclusions>
+			**/infrastructure/**,
+			**/config/**,
+			**/*Application.java,
+			**/domain/exception/**/ExceptionMessages.java
+		</sonar.coverage.exclusions>
 	</properties>
 
 	<dependencies>
