@@ -27,6 +27,6 @@ data "aws_secretsmanager_secret" "rds" {
   name = var.db_secret_name
 }
 
-data "aws_lb_target_group" "customer" {
-  name = "baitersburger-alb-tg"
-}
+#data "aws_lb_target_group" "customer" {
+#  name = "baitersburger-alb-tg"
+#}
