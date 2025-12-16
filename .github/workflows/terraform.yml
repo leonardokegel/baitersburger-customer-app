@@ -2,6 +2,10 @@ name: Terraform ECS
 
 on:
   workflow_call:
+    inputs:
+      image_uri:
+        required: true
+        type: string
 
 jobs:
   terraform:
@@ -36,4 +40,6 @@ jobs:
 
       - name: Terraform Apply
         working-directory: infra
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply -auto-approve \
+            -var="image_uri=${{ inputs.image_uri }}"

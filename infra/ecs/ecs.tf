@@ -20,7 +20,7 @@ resource "aws_ecs_task_definition" "this" {
   container_definitions = jsonencode([
     {
       name  = local.container_name
-      image = "${aws_ecr_repository.this.repository_url}:latest"
+      image = var.image_uri
 
       portMappings = [
         {

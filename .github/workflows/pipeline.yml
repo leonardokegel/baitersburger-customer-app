@@ -75,4 +75,6 @@ jobs:
   terraform-apply:
     needs: [ docker-build ]
     uses: ./.github/workflows/terraform.yml
+    with:
+      image_uri: ${{ needs.docker-build.outputs.image_uri }}
     secrets: inherit
