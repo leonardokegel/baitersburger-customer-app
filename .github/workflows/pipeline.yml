@@ -66,3 +66,8 @@ jobs:
         with:
           name: baitersburger-jar
           path: target/*.jar
+
+  docker-build:
+    needs: [ tests, build ]
+    uses: ./.github/workflows/docker.yml
+    secrets: inherit
