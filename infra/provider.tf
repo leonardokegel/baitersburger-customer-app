@@ -1,8 +1,13 @@
 terraform {
+  backend "s3" {
+    bucket = "baiters-burger-customer-app"
+    key    = "terraform/ecs/state.tfstate"
+    region = "us-east-1"
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.0"
+      version = "6.21.0"
     }
   }
 }

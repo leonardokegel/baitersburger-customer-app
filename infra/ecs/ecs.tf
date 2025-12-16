@@ -2,11 +2,6 @@ resource "aws_ecs_cluster" "this" {
   name = "${var.app_name}-cluster"
 }
 
-resource "aws_cloudwatch_log_group" "this" {
-  name              = "/ecs/${var.app_name}"
-  retention_in_days = 7
-}
-
 resource "aws_ecs_task_definition" "this" {
   family                   = var.app_name
   network_mode             = "awsvpc"
@@ -46,11 +41,12 @@ resource "aws_ecs_task_definition" "this" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.this.name
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "ecs"
+          "awslogs-group"         = local.log_group_name
+          "awslogs-region"        = "us-east-1"
+          "awslogs-stream-prefix" = "ecs"
         }
       }
+
     }
   ])
 }
@@ -63,11 +59,39 @@ resource "aws_ecs_service" "this" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnets.default.ids
+    subnets          = data.aws_subnets.aws_subnets_default.ids
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
   }
 
+  load_balancer {
+    target_group_arn = data.aws_lb_target_group.customer_lb_target_group.arn
+    container_name   = local.container_name
+    container_port   = var.container_port
+  }
+
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 200
+
   depends_on = [aws_ecs_task_definition.this]
+}
+
+resource "aws_security_group" "ecs" {
+  name   = "${var.app_name}-ecs-sg"
+  vpc_id = data.aws_vpc.vpc_default.id
+
+  ingress {
+    from_port   = var.container_port
+    to_port     = var.container_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
