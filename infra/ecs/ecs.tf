@@ -41,14 +41,17 @@ resource "aws_ecs_task_definition" "this" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = local.log_group_name
-          "awslogs-region"        = "us-east-1"
-          "awslogs-stream-prefix" = "ecs"
+          awslogs-group         = aws_cloudwatch_log_group.this.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
         }
       }
-
     }
   ])
+
+  depends_on = [
+    aws_cloudwatch_log_group.this
+  ]
 }
 
 resource "aws_ecs_service" "this" {
@@ -59,7 +62,7 @@ resource "aws_ecs_service" "this" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnets.aws_subnets_default.ids
+    subnets          = data.aws_subnets.default.ids
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
   }
@@ -73,12 +76,15 @@ resource "aws_ecs_service" "this" {
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
 
-  depends_on = [aws_ecs_task_definition.this]
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
 }
+
 
 resource "aws_security_group" "ecs" {
   name   = "${var.app_name}-ecs-sg"
-  vpc_id = data.aws_vpc.vpc_default.id
+  vpc_id = data.aws_vpc.default.id
 
   ingress {
     from_port   = var.container_port
