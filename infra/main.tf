@@ -6,4 +6,5 @@ module "ecs" {
   role_name       = "LabRole"
   db_secret_name  = "aws-rds-credentials"
   image_uri = var.image_uri
+  db_host   = var.db_host
 }

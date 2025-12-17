@@ -18,3 +18,8 @@ variable "db_secret_name" {
 variable "image_uri" {
   type = string
 }
+
+variable "db_host" {
+  description = "Endpoint do banco de dados recuperado via GitHub Secrets"
+  type        = string
+}

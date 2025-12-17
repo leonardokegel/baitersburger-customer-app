@@ -23,18 +23,21 @@ resource "aws_ecs_task_definition" "this" {
         }
       ]
 
+      environment = [
+        {
+          name  = "SPRING_DATASOURCE_URL"
+          value = "jdbc:mysql://${var.db_host}:3306/baitersburgercustomer"
+        }
+      ]
+
       secrets = [
         {
-          name      = "DB_USERNAME"
+          name      = "SPRING_DATASOURCE_USERNAME"
           valueFrom = "${data.aws_secretsmanager_secret.rds.arn}:username::"
         },
         {
-          name      = "DB_PASSWORD"
+          name      = "SPRING_DATASOURCE_PASSWORD"
           valueFrom = "${data.aws_secretsmanager_secret.rds.arn}:password::"
-        },
-        {
-          name      = "DB_NAME"
-          valueFrom = "${data.aws_secretsmanager_secret.rds.arn}:db_name::"
         }
       ]
 
