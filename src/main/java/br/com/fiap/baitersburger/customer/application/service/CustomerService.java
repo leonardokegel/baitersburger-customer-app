@@ -8,8 +8,6 @@ import br.com.fiap.baitersburger.customer.domain.port.in.GetCustomerByCpfUserCas
 import br.com.fiap.baitersburger.customer.domain.port.in.InsertCustomerUseCase;
 import br.com.fiap.baitersburger.customer.domain.port.out.CustomerRepositoryPort;
 
-import java.util.Optional;
-
 public class CustomerService implements InsertCustomerUseCase, GetCustomerByCpfUserCase {
 
     private final CustomerRepositoryPort customerRepositoryPort;
