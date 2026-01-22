@@ -98,10 +98,14 @@ A aplicação utiliza o **Jacoco** para medir a cobertura de testes. Existem reg
 * **Pacotes Monitorados:** Foco principal nas camadas de `application` (casos de uso) e `domain` (modelos e regras).
 * **Exclusões:** Classes de infraestrutura, configurações, mapeadores e a classe principal da aplicação são excluídas do relatório de cobertura para focar na lógica de negócio.
 
+![img.png](src/main/resources/static/img.png)
+
 #### Análise Estática (SonarCloud)
 O projeto está integrado ao **SonarCloud** para análise de "Code Smells", vulnerabilidades e bugs técnicos.
 * **Project Key:** `baitersburger-customer`.
 * **Frequência:** A análise é disparada automaticamente em cada Pull Request ou Push para a branch principal através do GitHub Actions.
+
+![img_1.png](src/main/resources/static/img_1.png)
 
 #### Como Executar os Testes
 
